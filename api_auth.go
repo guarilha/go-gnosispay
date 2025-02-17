@@ -101,6 +101,7 @@ func (c *Client) SignUp(email string) (*SignUpResponse, error) {
 	if err != nil {
 		return nil, err
 	}
+	c.AuthToken = resp.Token
 
 	return &resp, nil
 }

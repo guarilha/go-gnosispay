@@ -42,10 +42,24 @@ func (c *Client) GetNonce() (*string, error) {
 	return &nonce, nil
 }
 
-func (c *Client) GetAuthToken(address common.Address, privateKey *ecdsa.PrivateKey) (*string, error) {
-	nonce, err := c.GetNonce()
+func (c *Client) AuthenticateWithPrivateKey(address common.Address, privateKey *ecdsa.PrivateKey) (*string, error) {
+	message, err := c.GetSIWEMessage(address)
 	if err != nil {
 		return nil, err
+	}
+
+	signedMessage, err := wallet.SignMessage(message, privateKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.GetAuthToken(message, wallet.SignatureToString(signedMessage))
+}
+
+func (c *Client) GetSIWEMessage(address common.Address) (string, error) {
+	nonce, err := c.GetNonce()
+	if err != nil {
+		return "", err
 	}
 
 	msg, err := siwe.InitMessage(
@@ -58,21 +72,19 @@ func (c *Client) GetAuthToken(address common.Address, privateKey *ecdsa.PrivateK
 		},
 	)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	message := msg.String()
-	signedMessage, err := wallet.SignMessage(message, privateKey)
-	if err != nil {
-		return nil, err
-	}
+	return msg.String(), nil
+}
 
+func (c *Client) GetAuthToken(message string, signature string) (*string, error) {
 	var jwt struct {
 		Token string `json:"token"`
 	}
-	err = c.doRequest(http.MethodPost, "/api/v1/auth/challenge", map[string]string{
+	err := c.doRequest(http.MethodPost, "/api/v1/auth/challenge", map[string]string{
 		"message":   message,
-		"signature": wallet.SignatureToString(signedMessage),
+		"signature": signature,
 	}, &jwt)
 	if err != nil {
 		return nil, err

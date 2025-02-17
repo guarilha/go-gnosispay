@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log/slog"
 	"net/http"
 	"net/url"
 	"time"
@@ -55,8 +54,6 @@ func (c *Client) doRequest(method, endpoint string, body interface{}, result int
 	if err != nil {
 		return err
 	}
-
-	slog.Info("gnosispay.doRequest", "method", method, "endpoint", endpoint, "url", url)
 
 	// Marshal body if provided
 	var reqBody io.Reader

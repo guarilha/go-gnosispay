@@ -1,7 +1,6 @@
 package gnosispay
 
 import (
-	"context"
 	"crypto/ecdsa"
 	"fmt"
 	"io"
@@ -89,11 +88,12 @@ func (c *Client) GetAuthToken(message string, signature string) (*string, error)
 	if err != nil {
 		return nil, err
 	}
+	c.AuthToken = jwt.Token
 
 	return &jwt.Token, nil
 }
 
-func (c *Client) SignUp(ctx context.Context, email string) (*SignUpResponse, error) {
+func (c *Client) SignUp(email string) (*SignUpResponse, error) {
 	var resp SignUpResponse
 	err := c.doRequest(http.MethodPost, "/api/v1/auth/signup", map[string]string{
 		"authEmail": email,

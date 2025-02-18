@@ -39,16 +39,15 @@ func main() {
     baseURL := "https://api.gnosis-pay.com"
     domain := "your-app.com" // Your application's domain for SIWE
     uri := "https://your-app.com" // Your application's URI for SIWE
-    chainID := 100 // Gnosis Chain ID
 
-    client, err := gnosispay.NewClient(baseURL, domain, uri, chainID)
+    client, err := gnosispay.NewClient(baseURL, domain, uri)
     if err != nil {
         log.Fatalf("Failed to create client: %v", err)
     }
 }
 ```
 
-### Authentication Flow
+## Authentication Flow
 
 The SDK supports Sign In With Ethereum (SIWE) authentication. Here are the main authentication methods:
 
@@ -113,7 +112,7 @@ func main() {
 }
 ```
 
-### User Management
+## User Management
 
 After authentication, you can access user information:
 

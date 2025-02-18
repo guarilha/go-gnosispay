@@ -25,7 +25,7 @@ type Client struct {
 // domain is your application's domain for SIWE authentication
 // uri is your application's URI for SIWE authentication
 // chainID is the blockchain network ID (e.g., 100 for Gnosis Chain)
-func NewClient(baseURL, domain, uri string, chainID int) (*Client, error) {
+func NewClient(baseURL, domain, uri string) (*Client, error) {
 	parsedURL, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, fmt.Errorf("invalid base URL: %w", err)
@@ -39,7 +39,7 @@ func NewClient(baseURL, domain, uri string, chainID int) (*Client, error) {
 		AuthToken: "",
 		Domain:    domain,
 		Uri:       uri,
-		ChainID:   chainID,
+		ChainID:   100, // Gnosis Chain ID (mainnet)
 	}, nil
 }
 

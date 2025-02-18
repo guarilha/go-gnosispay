@@ -15,7 +15,7 @@ func main() {
 	uri := "https://your-app.com" // Your application's URI for SIWE
 	chainID := 100                // Gnosis Chain ID
 
-	client, err := gnosispay.NewClient(baseURL, domain, uri, chainID)
+	client, err := gnosispay.NewClient(baseURL, domain, uri)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}

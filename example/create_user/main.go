@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -13,7 +14,7 @@ func main() {
 	baseURL := "https://api.gnosispay.com"
 	uri := "https://your-app.com" // Your application's URI for SIWE
 
-	client, err := gnosispay.NewClient(baseURL, uri)
+	client, err := gnosispay.New(nil, gnosispay.SetBaseURL(baseURL), gnosispay.SetSIWEParams(uri))
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
@@ -26,14 +27,14 @@ func main() {
 
 	address := crypto.PubkeyToAddress(privateKey.PublicKey)
 
-	_, err = client.AuthenticateWithPrivateKey(address, privateKey)
+	_, err = client.Auth.AuthenticateWithPrivateKey(context.Background(), address, privateKey)
 	if err != nil {
 		log.Fatalf("Authentication failed: %v", err)
 	}
 
 	// Sign up with email
 	email := fmt.Sprintf("user_%s@example.com", address)
-	response, err := client.SignUp(email)
+	response, err := client.Auth.SignUp(context.Background(), email)
 	if err != nil {
 		log.Fatalf("Sign up failed: %v", err)
 	}

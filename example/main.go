@@ -11,10 +11,9 @@ import (
 func main() {
 	// Initialize the Gnosis Pay client
 	baseURL := "https://api.gnosispay.com"
-	domain := "your-app.com"      // Your application's domain for SIWE
 	uri := "https://your-app.com" // Your application's URI for SIWE
 
-	client, err := gnosispay.NewClient(baseURL, domain, uri)
+	client, err := gnosispay.NewClient(baseURL, uri)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}

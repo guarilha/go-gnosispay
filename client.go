@@ -22,14 +22,23 @@ type Client struct {
 
 // NewClient creates a new Gnosis Pay API client.
 // baseURL is the API endpoint (e.g., "https://api.gnosispay.com")
-// domain is your application's domain for SIWE authentication
-// uri is your application's URI for SIWE authentication
-// chainID is the blockchain network ID (e.g., 100 for Gnosis Chain)
-func NewClient(baseURL, domain, uri string) (*Client, error) {
+// yourAppUri is your application's URI for SIWE authentication
+func NewClient(baseURL, yourAppUri string) (*Client, error) {
+	if baseURL == "" || yourAppUri == "" {
+		return nil, fmt.Errorf("baseURL and yourAppUri cannot be empty")
+	}
+
 	parsedURL, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, fmt.Errorf("invalid base URL: %w", err)
 	}
+
+	parsedYourAppUri, err := url.Parse(yourAppUri)
+	if err != nil {
+		return nil, fmt.Errorf("invalid application URI: %w", err)
+	}
+
+	domain := parsedYourAppUri.Host
 
 	return &Client{
 		BaseURL: parsedURL,
@@ -38,7 +47,7 @@ func NewClient(baseURL, domain, uri string) (*Client, error) {
 		},
 		AuthToken: "",
 		Domain:    domain,
-		Uri:       uri,
+		Uri:       yourAppUri,
 		ChainID:   100, // Gnosis Chain ID (mainnet)
 	}, nil
 }

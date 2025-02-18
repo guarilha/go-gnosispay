@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -44,6 +45,10 @@ func NewClient(baseURL, domain, uri string, chainID int) (*Client, error) {
 
 // buildURL ensures safe URL concatenation
 func (c *Client) buildURL(endpoint string) (string, error) {
+	if endpoint == "" {
+		return "", fmt.Errorf("endpoint cannot be empty")
+	}
+
 	relPath, err := url.Parse(endpoint)
 	if err != nil {
 		return "", fmt.Errorf("invalid endpoint path: %w", err)
@@ -55,6 +60,10 @@ func (c *Client) buildURL(endpoint string) (string, error) {
 
 // doRequest handles API requests with authentication
 func (c *Client) doRequest(method, endpoint string, body interface{}, result interface{}) error {
+	if !c.IsAuthenticated() && !strings.Contains(endpoint, "/auth/") {
+		return fmt.Errorf("client is not authenticated")
+	}
+
 	url, err := c.buildURL(endpoint)
 	if err != nil {
 		return err
@@ -90,8 +99,12 @@ func (c *Client) doRequest(method, endpoint string, body interface{}, result int
 
 	// Check HTTP status code
 	if resp.StatusCode >= 400 {
-		fmt.Println()
-		return fmt.Errorf("API error: status %d", resp.StatusCode)
+		var apiError ApiError
+		if err := json.NewDecoder(resp.Body).Decode(&apiError); err != nil {
+			return fmt.Errorf("failed to decode error response: %w", err)
+		}
+
+		return fmt.Errorf("API error (status %d): %v %v", resp.StatusCode, apiError.Message, apiError.Error)
 	}
 
 	// Decode response

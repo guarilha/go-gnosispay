@@ -2,6 +2,12 @@ package gnosispay
 
 import "time"
 
+type ApiError struct {
+	Message string `json:"message,omitempty"`
+	Error   string `json:"error,omitempty"`
+	Code    int    `json:"code,omitempty"`
+}
+
 type SignUpResponse struct {
 	ID    string `json:"id"`
 	Token string `json:"token"`

@@ -28,7 +28,7 @@ go get github.com/guarilha/go-gnosispay
 package main
 
 import (
-    "fmt"
+    "context"
     "log"
 
     gnosispay "github.com/guarilha/go-gnosispay"
@@ -36,24 +36,29 @@ import (
 
 func main() {
     // Initialize the Gnosis Pay client
-    baseURL := "https://api.gnosis-pay.com"
-    domain := "your-app.com" // Your application's domain for SIWE
-    uri := "https://your-app.com" // Your application's URI for SIWE
-
-    client, err := gnosispay.NewClient(baseURL, domain, uri)
+    client, err := gnosispay.New(nil,
+        gnosispay.SetBaseURL("https://api.gnosispay.com"),
+        gnosispay.SetSIWEParams("https://your-app.com"),
+    )
     if err != nil {
         log.Fatalf("Failed to create client: %v", err)
     }
 }
 ```
 
-## Authentication Flow
+## Authentication
 
 The SDK supports Sign In With Ethereum (SIWE) authentication. Here are the main authentication methods:
 
 1. **Using a Private Key**:
 
 ```go
+import (
+    "context"
+    "github.com/ethereum/go-ethereum/common"
+    "github.com/ethereum/go-ethereum/crypto"
+)
+
 func main() {
     // ... client setup ...
 
@@ -62,7 +67,7 @@ func main() {
     address := common.HexToAddress("0x...") // your ethereum address
 
     // Authenticate with private key
-    _, err := client.AuthenticateWithPrivateKey(address, privateKey)
+    _, err := client.Auth.AuthenticateWithPrivateKey(address, privateKey)
     if err != nil {
         log.Fatalf("Authentication failed: %v", err)
     }
@@ -87,7 +92,7 @@ func main() {
     signature := // ... sign the message ...
 
     // 3. Get authentication token
-    _, err := client.GetAuthToken(message, signature)
+    _, err := client.Auth.GetAuthToken(message, signature)
     if err != nil {
         log.Fatalf("Failed to get auth token: %v", err)
     }
@@ -102,7 +107,7 @@ func main() {
     // ... client setup and authentication ...
 
     // Sign up with email
-    response, err := client.SignUp("user@example.com")
+    response, err := client.Auth.SignUp("user@example.com")
     if err != nil {
         log.Fatalf("Sign up failed: %v", err)
     }
@@ -121,7 +126,7 @@ func main() {
     // ... authentication ...
 
     // Get user details
-    user, err := client.GetUser()
+    user, err := client.User.GetUser()
     if err != nil {
         log.Fatalf("Failed to get user: %v", err)
     }
@@ -138,7 +143,7 @@ func main() {
     // ... authentication ...
 
     // Get user's cards
-    cards, err := client.GetCards()
+    cards, err := client.Cards.GetCards()
     if err != nil {
         log.Fatalf("Failed to get cards: %v", err)
     }
@@ -148,7 +153,7 @@ func main() {
         CardTokens: &cards[0].Id,
         // Add other filters as needed
     }
-    transactions, err := client.GetTransactions(filters)
+    transactions, err := client.Cards.GetTransactions(filters)
     if err != nil {
         log.Fatalf("Failed to get transactions: %v", err)
     }
@@ -159,6 +164,8 @@ func main() {
 
 Comprehensive documentation for the Gnosis Pay API can be found in the [official Gnosis Pay documentation](https://docs.gnosispay.com).
 This includes detailed guides on account management, card issuance, IBAN services, and more.
+
+Checkout the [examples](./example) directory for complete implementation examples.
 
 ## Contributing
 

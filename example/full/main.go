@@ -26,7 +26,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Use services
 	ctx := context.Background()
 
 	pk, err := crypto.HexToECDSA(os.Getenv("PRIVATE_KEY"))
@@ -37,12 +36,13 @@ func main() {
 
 	address := common.HexToAddress(os.Getenv("ADDRESS"))
 
+	// Auth
 	_, err = client.Auth.AuthenticateWithPrivateKey(ctx, address, pk)
 	if err != nil {
 		log.Fatalf("Authentication failed: %v", err)
 	}
 
-	// Get user details
+	// User
 	user, err := client.User.Get(ctx)
 	if err != nil {
 		log.Fatalf("Failed to get user: %v", err)
@@ -68,14 +68,14 @@ func main() {
 	fmt.Printf("integration: %v\n", integration)
 
 	// IBAN
-	details, err := client.IBAN.GetDetails(ctx)
+	available, err := client.IBAN.CheckAvailability(ctx)
 	if err != nil {
-		log.Fatalf("Failed to get details: %v", err)
+		log.Fatalf("Failed to get available: %v", err)
 	}
-	fmt.Printf("details: %v\n", details)
+	fmt.Printf("available: %v\n", available)
 
-	// Account Management
-	balances, err := client.AccountManagement.GetBalances(ctx)
+	// Account
+	balances, err := client.Account.GetBalances(ctx)
 	if err != nil {
 		log.Fatalf("Failed to get balances: %v", err)
 	}

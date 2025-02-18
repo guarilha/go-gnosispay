@@ -41,12 +41,12 @@ type Client struct {
 	ChainID int
 
 	// Services used for communicating with different parts of the Gnosis Pay API.
-	Auth              *AuthService
-	User              *UserService
-	Cards             *CardService
-	KYC               *KYCService
-	IBAN              *IBANService
-	AccountManagement *AccountManagementService
+	Auth    *AuthService
+	User    *UserService
+	Cards   *CardService
+	KYC     *KYCService
+	IBAN    *IBANService
+	Account *AccountManagementService
 }
 
 // ClientOpt are options for New.
@@ -81,7 +81,7 @@ func New(httpClient *http.Client, opts ...ClientOpt) (*Client, error) {
 	c.Cards = &CardService{client: c}
 	c.KYC = &KYCService{client: c}
 	c.IBAN = &IBANService{client: c}
-	c.AccountManagement = &AccountManagementService{client: c}
+	c.Account = &AccountManagementService{client: c}
 
 	return c, nil
 }

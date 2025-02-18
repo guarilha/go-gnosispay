@@ -58,7 +58,7 @@ func TestNewClient(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client, err := NewClient(tt.baseURL, tt.uri)
+			client, err := New(nil, SetBaseURL(tt.baseURL), SetSIWEParams(tt.uri))
 
 			if tt.wantErr {
 				if err == nil {

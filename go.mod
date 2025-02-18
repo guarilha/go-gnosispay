@@ -4,6 +4,7 @@ go 1.23.4
 
 require (
 	github.com/ethereum/go-ethereum v1.15.2
+	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/spruceid/siwe-go v0.2.1
 )
 

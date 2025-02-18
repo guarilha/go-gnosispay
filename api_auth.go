@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/guarilha/go-gnosispay/wallet"
 	"github.com/spruceid/siwe-go"
 )
@@ -94,6 +96,9 @@ func (c *Client) GetAuthToken(message string, signature string) (*string, error)
 }
 
 func (c *Client) SignUp(email string) (*SignUpResponse, error) {
+	if email == "" {
+		return nil, fmt.Errorf("email cannot be empty")
+	}
 	var resp SignUpResponse
 	err := c.doRequest(http.MethodPost, "/api/v1/auth/signup", map[string]string{
 		"authEmail": email,
@@ -104,4 +109,39 @@ func (c *Client) SignUp(email string) (*SignUpResponse, error) {
 	c.AuthToken = resp.Token
 
 	return &resp, nil
+}
+
+func isTokenExpired(tokenString string) (bool, error) {
+	// Parse the token
+	token, _, err := new(jwt.Parser).ParseUnverified(tokenString, jwt.MapClaims{})
+	if err != nil {
+		return true, err
+	}
+
+	// Extract claims
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return true, fmt.Errorf("invalid token claims")
+	}
+
+	// Check expiration time
+	if exp, ok := claims["exp"].(float64); ok {
+		expirationTime := time.Unix(int64(exp), 0)
+		return expirationTime.Before(time.Now()), nil
+	}
+
+	return true, fmt.Errorf("no expiration claim found")
+}
+
+func (c *Client) IsAuthenticated() bool {
+	if c.AuthToken == "" {
+		return false
+	}
+
+	expired, err := isTokenExpired(c.AuthToken)
+	if err != nil || expired {
+		return false
+	}
+
+	return true
 }

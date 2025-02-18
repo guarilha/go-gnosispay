@@ -29,6 +29,7 @@ func fetchPlainText(url string) (string, error) {
 	return string(body), nil
 }
 
+// GetNonce retrieves a new nonce from the server for use in SIWE authentication.
 func (c *Client) GetNonce() (*string, error) {
 	url, err := c.buildURL("/api/v1/auth/nonce")
 	if err != nil {
@@ -43,6 +44,9 @@ func (c *Client) GetNonce() (*string, error) {
 	return &nonce, nil
 }
 
+// AuthenticateWithPrivateKey performs authentication using an Ethereum private key.
+// It generates a SIWE message, signs it with the provided private key, and obtains an auth token.
+// The auth token is automatically set in the client if successful.
 func (c *Client) AuthenticateWithPrivateKey(address common.Address, privateKey *ecdsa.PrivateKey) (*string, error) {
 	message, err := c.GetSIWEMessage(address)
 	if err != nil {
@@ -57,6 +61,8 @@ func (c *Client) AuthenticateWithPrivateKey(address common.Address, privateKey *
 	return c.GetAuthToken(message, wallet.SignatureToString(signedMessage))
 }
 
+// GetSIWEMessage generates a Sign-In with Ethereum (SIWE) message for the given address.
+// The message includes a nonce from the server and is formatted according to the SIWE specification.
 func (c *Client) GetSIWEMessage(address common.Address) (string, error) {
 	nonce, err := c.GetNonce()
 	if err != nil {
@@ -79,6 +85,9 @@ func (c *Client) GetSIWEMessage(address common.Address) (string, error) {
 	return msg.String(), nil
 }
 
+// GetAuthToken obtains an authentication token by submitting a signed SIWE message.
+// The token is automatically set in the client if successful.
+// The message should be a valid SIWE message and signature should be the corresponding signature.
 func (c *Client) GetAuthToken(message string, signature string) (*string, error) {
 	var jwt struct {
 		Token string `json:"token"`
@@ -95,6 +104,9 @@ func (c *Client) GetAuthToken(message string, signature string) (*string, error)
 	return &jwt.Token, nil
 }
 
+// SignUp registers a new user with the provided email address.
+// Returns a SignUpResponse containing the user ID and initial auth token.
+// The auth token is automatically set in the client if successful.
 func (c *Client) SignUp(email string) (*SignUpResponse, error) {
 	if email == "" {
 		return nil, fmt.Errorf("email cannot be empty")
@@ -133,6 +145,8 @@ func isTokenExpired(tokenString string) (bool, error) {
 	return true, fmt.Errorf("no expiration claim found")
 }
 
+// IsAuthenticated checks if the client has a valid, non-expired authentication token.
+// Returns true if the client is authenticated and the token is valid.
 func (c *Client) IsAuthenticated() bool {
 	if c.AuthToken == "" {
 		return false

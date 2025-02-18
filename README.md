@@ -96,7 +96,7 @@ func main() {
 }
 ```
 
-3. **Sign Up**:
+## Sign Up to Gnosis Pay
 
 ```go
 func main() {

@@ -13,7 +13,6 @@ func main() {
 	baseURL := "https://api.gnosispay.com"
 	domain := "your-app.com"      // Your application's domain for SIWE
 	uri := "https://your-app.com" // Your application's URI for SIWE
-	chainID := 100                // Gnosis Chain ID
 
 	client, err := gnosispay.NewClient(baseURL, domain, uri)
 	if err != nil {

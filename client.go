@@ -19,7 +19,7 @@ type Client struct {
 	ChainID    int
 }
 
-func NewClient(baseURL, authToken, domain, uri string, chainID int) (*Client, error) {
+func NewClient(baseURL, domain, uri string, chainID int) (*Client, error) {
 	parsedURL, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, fmt.Errorf("invalid base URL: %w", err)
@@ -30,7 +30,7 @@ func NewClient(baseURL, authToken, domain, uri string, chainID int) (*Client, er
 		HTTPClient: &http.Client{
 			Timeout: 10 * time.Second,
 		},
-		AuthToken: authToken,
+		AuthToken: "",
 		Domain:    domain,
 		Uri:       uri,
 		ChainID:   chainID,

@@ -5,18 +5,17 @@ import (
 	"log"
 
 	"github.com/ethereum/go-ethereum/crypto"
-	gnosispay "github.com/guarilha/go-gnosispay"
+	"github.com/guarilha/go-gnosispay"
 )
 
 func main() {
 	// Initialize the Gnosis Pay client
 	baseURL := "https://api.gnosispay.com"
-	authToken := ""               // Will be obtained after authentication
 	domain := "your-app.com"      // Your application's domain for SIWE
 	uri := "https://your-app.com" // Your application's URI for SIWE
 	chainID := 100                // Gnosis Chain ID
 
-	client, err := gnosispay.NewClient(baseURL, authToken, domain, uri, chainID)
+	client, err := gnosispay.NewClient(baseURL, domain, uri, chainID)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
@@ -35,7 +34,8 @@ func main() {
 	}
 
 	// Sign up with email
-	response, err := client.SignUp("user@example.com")
+	email := fmt.Sprintf("user_%s@example.com", address)
+	response, err := client.SignUp(email)
 	if err != nil {
 		log.Fatalf("Sign up failed: %v", err)
 	}
